@@ -23,6 +23,9 @@ import { ModalComponent } from './modal/modal.component';
     HttpClientModule,
     FormsModule
   ],
+  exports: [
+    TaskComponent
+  ],
   providers: [],
   bootstrap: [AppComponent]
 })
