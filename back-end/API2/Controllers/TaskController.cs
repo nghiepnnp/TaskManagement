@@ -1,4 +1,5 @@
 ﻿using System.Data.Entity;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Http;
 using API2.Common;
@@ -22,10 +23,12 @@ namespace API2.Controllers
                 if (Id is null)
                 {
                     var result = await dbContext.Tasks.ToListAsync();
+                    var staffInTask = await dbContext.StaffInTasks.ToListAsync();
 
                     result.ForEach(x =>
                     {
                         x.StartDate.ToString("yyyyMMdd");
+                        x.StaffId = staffInTask.First(y => y.IdTask == x.Id).IdStaff;
                     });
 
 
@@ -38,31 +41,53 @@ namespace API2.Controllers
         }
 
         [HttpPost]
-        public async Task<IHttpActionResult> Post([FromBody] Models.Task task)
+        public async Task<IHttpActionResult> Post([FromBody] Models.DTO.TaskDto task)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            using (var dbContext = new TaskManagementDbContext())
+            try
             {
-                dbContext.Tasks.Add(new Models.Task()
+                using (var dbContext = new TaskManagementDbContext())
                 {
-                    IdParent = task.IdParent,
-                    Id = task.Id,
-                    Label = task.Label,
-                    Type = task.Type,
-                    Name = task.Name,
-                    StartDate = task.StartDate,
-                    EndDate = task.EndDate,
-                    Duration = task.Duration,
-                    Progress = task.Progress,
-                    IsUnscheduled = task.IsUnscheduled
-                });
+                    dbContext.Tasks.Add(new Models.Task()
+                    {
+                        IdParent = task.IdParent,
+                        Id = task.Id,
+                        Label = task.Label ?? string.Empty,
+                        Type = task.Type ?? string.Empty,
+                        Name = task.Name,
+                        StartDate = task.StartDate,
+                        EndDate = task.EndDate,
+                        Duration = task.Duration,
+                        Progress = task.Progress,
+                        IsUnscheduled = task.IsUnscheduled
+                    });
 
-                return Ok(new ApiResult(await dbContext.SaveChangesAsync() > 0));
+                    await dbContext.SaveChangesAsync();
+
+                    var lastId = await dbContext.Tasks.OrderByDescending(x => x.Id).FirstOrDefaultAsync();
+
+                    dbContext.StaffInTasks.Add(new StaffInTask()
+                    {
+                        IdStaff = task.StaffId,
+                        IdTask = lastId.Id
+                    });
+
+                    await dbContext.SaveChangesAsync();
+
+
+                    return Ok(new ApiResult(true));
+                }
             }
+            catch (System.Exception ex)
+            {
+
+                throw;
+            }
+
         }
 
         [HttpGet]
@@ -77,7 +102,7 @@ namespace API2.Controllers
 
         [HttpPut]
         [Route("{Id}")]
-        public async Task<IHttpActionResult> Put(int Id, [FromBody] Models.Task upd)
+        public async Task<IHttpActionResult> Put(int Id, [FromBody] Models.DTO.TaskDto upd)
         {
             if (!ModelState.IsValid)
             {
@@ -89,8 +114,8 @@ namespace API2.Controllers
                 if (await dbContext.Tasks.FirstOrDefaultAsync(x => x.Id == Id) is Models.Task task)
                 {
                     task.IdParent = upd.IdParent;
-                    task.Label = upd.Label;    
-                    task.Type = upd.Type;
+                    task.Label = upd.Label ?? string.Empty;
+                    task.Type = upd.Type ?? string.Empty;
                     task.Name = upd.Name;
                     task.StartDate = upd.StartDate;
                     task.EndDate = upd.EndDate;
@@ -98,7 +123,12 @@ namespace API2.Controllers
                     task.Progress = upd.Progress;
                     task.IsUnscheduled = upd.IsUnscheduled;
 
-                    return Ok(new ApiResult(await dbContext.SaveChangesAsync() > 0));
+                    var staffInTask = await dbContext.StaffInTasks.FirstOrDefaultAsync(x => x.IdTask == Id);
+                    staffInTask.IdStaff = upd.StaffId;
+
+                    await dbContext.SaveChangesAsync();
+
+                    return Ok(new ApiResult(true));
                 }
             }
 

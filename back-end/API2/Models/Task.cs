@@ -48,6 +48,7 @@ namespace API2.Models
         public int Duration { get; set; }
         public int Progress { get; set; }
         public byte IsUnscheduled { get; set; }
+        public int StaffId { get; set; }
 
 
         //[JsonProperty("parent")]

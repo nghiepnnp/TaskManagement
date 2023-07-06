@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Task, gantt } from "dhtmlx-gantt";
 import { TaskService } from '../services/task.service';
+import { StaffService } from '../services/staff.service';
 //import { Task } from '../models/task';
 import * as moment from 'moment';
 import { timeout } from 'rxjs';
@@ -14,83 +15,35 @@ import { timeout } from 'rxjs';
 export class TaskComponent implements OnInit {
 
   private listTask: Task[] = [];
+  private listStaff: any[] = [];
 
-  constructor(private taskService: TaskService) { }
+  constructor(private taskService: TaskService, private staffService: StaffService) { }
 
   ngOnInit(): void {
     this.loadGantt();
-
-    gantt.config.date_format = '%Y-%m-%d %H:%i';
-
-    gantt.init('ganttContainer');
-
-    const dp = gantt.createDataProcessor({
-      task: {
-        // update: (data: Task) => this.staffService.update(1,data),
-        // create: (data: Task) => this.taskService.insert(data),
-        // delete: (id: any) => this.taskService.remove(id)
-      },
-      link: {
-      }
-    });
-
-    // const kk = this.taskService.get() .then((response) => response.Result);
-
-    // console.log(kk.result)
-
-    // gantt.parse(kk);
-
-
-
-
-
-    //   Promise.all([this.taskService.get()])
-    //   	.then(([data]) => {
-    //   		gantt.parse({ data });
-    //   	});
-
-    //     // new Promise((resolve, reject) => {
-    //     //   setTimeout(() => {
-    //     //     resolve('foo');
-    //     //   }, 300);
-    //     // });
-
-    //   console.log('k')
-    // }
-
   }
 
 
-
-
-
-
-
-
   loadGantt() {
-
     this.loadData();
-
     setTimeout(() => {
-
-      // console.info('loadGantt: ');
-      // console.info(this.listTask);
-
-      // console.info('loadGantt: ');
-      // console.info(this.listTask);
-
-      //this.ganttConfig();
-
-      //gantt.deleteTask( 16)
-
-
-
-      gantt.config.date_format = '%Y-%m-%d %H:%i';
-
-
-      var dp = gantt.createDataProcessor({
+      this.ganttConfig()
+      gantt.init('ganttContainer');
+      gantt.parse({ data: this.listTask })
+      gantt.createDataProcessor({
         task: {
-          update: (id: number, data: Task) => {
+          create: (data: any) => {
+            data.id = 0;
+            this.taskService.insert(data).subscribe(
+              (response) => {
+                if (response.Ok === true) {
+                  alert('Success')
+                } else {
+                  alert('Error');
+                }
+              })
+          },
+          update: (data: any, id: any) => {
 
             console.log('Alo data update dau')
             console.log(id)
@@ -105,26 +58,27 @@ export class TaskComponent implements OnInit {
                 }
               }
             )
-
-            //setTimeout(() => console.log(result.), 500)
-
           },
-          create: (data: Task) => this.taskService.insert(data),
-          delete: (id: any) => this.taskService.delete(id)
+
+          delete: (id: number) => {
+            this.taskService.delete(id).subscribe(
+              (response) => {
+                if (response.Ok === true) {
+                  alert('Success')
+                } else {
+                  alert('Error');
+                }
+              }
+            )
+          }
         }
       });
-      setTimeout(() => {
-        console.log("Init Success")
-        gantt.init('ganttContainer');
-        console.log("Parse")
-        gantt.parse({ data: this.listTask })
-
-      }, 500)
-
 
     }, 200) // end func timeout
 
   }
+
+
 
 
 
@@ -138,7 +92,10 @@ export class TaskComponent implements OnInit {
             start_date: new Date(item.StartDate),
             duration: item.Duration,
             progress: item.Progess,
-            parent: item.IdParent
+            parent: item.IdParent,
+            type: item.Type,
+            label: item.Label,
+            staffId: item.StaffId
           };
           return mappedItem;
         })
@@ -146,7 +103,68 @@ export class TaskComponent implements OnInit {
         console.info(this.listTask);
       }
     );
+
+    this.loadListStaff();
   }
+
+
+  ganttConfig() {
+
+    //setTimeout(() => this.loadListStaff(), 400);
+
+    console.log(this.listStaff)
+
+    gantt.config.date_format = '%Y-%m-%d %H:%i';
+
+    gantt.config.grid_width = 800;
+    gantt.config.columns = [
+      { name: "text", label: 'Name', tree: true, width: 200, resize: true },
+      { name: "label", label: "Label", align: "center", width: 50 },
+      { name: "type", label: "Type", align: "center", width: 50 },
+      { name: "start_date", label: "Start Date", align: "center", width: 100 },
+      { name: "duration", label: "Duration", align: "center", width: 100 },
+      { name: "add", label: "", width: 44 }
+    ];
+
+    gantt.config.lightbox.sections = [
+      { name: "description", height: 55, map_to: "text", type: "textarea", focus: true },
+      {
+        name: "label", height: 32, map_to: "label", type: "select", options: [
+          { key: "Feature", label: "Feature" },
+          { key: "Bug", label: "Bug" },
+          { key: "Hotfix", label: "Hotfix" }
+        ]
+      },
+      {
+        name: "type", height: 32, map_to: "type", type: "select", options: [
+          { key: "High", label: "High" },
+          { key: "Normal", label: "Normal" },
+          { key: "Low", label: "Low" }
+        ]
+      },
+      {
+        name: "staff", height: 32, map_to: "staffId", type: "select", options: this.listStaff
+      },
+      { name: "time", type: "duration", map_to: "auto" }];
+
+  }
+
+  loadListStaff() {
+    this.staffService.search('').subscribe(
+      (response: any) => {
+
+        this.listStaff = response.Result.map((item: any) => ({
+          key: item.Id,
+          label: item.ShortName
+        }));
+
+        console.log(this.listStaff)
+
+      }
+    );
+  }
+
+
 
   //tend
 }

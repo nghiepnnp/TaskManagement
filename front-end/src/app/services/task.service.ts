@@ -58,16 +58,19 @@ export class TaskService {
     return this.http.get(`${this.url}?name=${keyword}`);
   }
 
-  delete(task: Task): Observable<any> {
-    const url = `${this.url}/${task.id}`;
+  delete(id: number): Observable<any> {
+    const url = `${this.url}/${id}`;
     return this.http.delete(url);
   }
 
   //
   update(id: number, task: Task): Observable<any> {
+
+    console.log('service')
     console.log(id)
     console.log(task)
-    const url = `${this.url}/${id}`;
+
+    const url = `${this.url}/${task.id}`;
     return this.http.put(url, task);
   }
 
@@ -75,8 +78,7 @@ export class TaskService {
 
 
   insert(data: any): Observable<any> {
-    const url = `https://localhost:44305/api/staff`;
-    return this.http.post(url, data);
+    return this.http.post(this.url, data);
   }
 
 

@@ -146,6 +146,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\DTO\TaskDto.cs" />
     <Compile Include="Models\Staff.cs">
       <DependentUpon>TaskManagementDbContext.tt</DependentUpon>
     </Compile>
