@@ -9,11 +9,35 @@
 
 namespace API2.Models
 {
+    using Newtonsoft.Json;
     using System;
     using System.Collections.Generic;
     
     public partial class Task
     {
+        //[JsonProperty("parent")]
+        //public int IdParent { get; set; }
+        //[JsonProperty("id")]
+        //public int Id { get; set; }
+        //[JsonProperty("label")]
+        //public string Label { get; set; }
+        //[JsonProperty("type")]
+        //public string Type { get; set; }
+        //[JsonProperty("name")]
+        //public string Name { get; set; }
+        //[JsonProperty("start_date")]
+        //public System.DateTime StartDate { get; set; }
+        //[JsonProperty("end_date")]
+        //public System.DateTime EndDate { get; set; }
+        //[JsonProperty("duration")]
+        //public int Duration { get; set; }
+        //[JsonProperty("progress")]
+        //public int Progress { get; set; }
+        //[JsonIgnore]
+        //public byte IsUnscheduled { get; set; }
+
+
+
         public int IdParent { get; set; }
         public int Id { get; set; }
         public string Label { get; set; }
@@ -24,5 +48,29 @@ namespace API2.Models
         public int Duration { get; set; }
         public int Progress { get; set; }
         public byte IsUnscheduled { get; set; }
+
+
+        //[JsonProperty("parent")]
+        //public int IdParent { get; set; }
+        //[JsonProperty("id")]
+        //public int Id { get; set; }
+        //[JsonIgnore]
+        //public string Label { get; set; }
+        //[JsonIgnore]
+        //public string Type { get; set; }
+        //[JsonProperty("text")]
+        //public string Name { get; set; }
+        //[JsonProperty("start_date")]
+        //public System.DateTime StartDate { get; set; }
+        //[JsonProperty("end_date")]
+        //public System.DateTime EndDate { get; set; }
+        //[JsonProperty("duration")]
+        //public int Duration { get; set; }
+        //[JsonProperty("progress")]
+        //public int Progress { get; set; }
+        //[JsonIgnore]
+        //public byte IsUnscheduled { get; set; }
+
+
     }
 }

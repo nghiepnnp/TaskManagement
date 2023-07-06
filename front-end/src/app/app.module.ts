@@ -17,14 +17,14 @@ import { ModalComponent } from './modal/modal.component';
     TaskComponent,
     ModalComponent
   ],
-  imports: [
+  imports: [    
+    HttpClientModule,
     BrowserModule,
     AppRoutingModule,
-    HttpClientModule,
     FormsModule
   ],
   exports: [
-    TaskComponent
+    
   ],
   providers: [],
   bootstrap: [AppComponent]

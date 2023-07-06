@@ -46,7 +46,8 @@ export class ModalComponent {
           if (response.Ok === true) {
             alert("Create successfull, reoad lai trang de")
             this.modal.close();
-            this.searchListStaff('')
+            window.location.reload();
+
           } else {
             alert('Error');
           }
@@ -58,7 +59,9 @@ export class ModalComponent {
           if (response.Ok === true) {
             alert("Update successfull, reoad lai trang de")
             this.modal.close();
-            this.searchListStaff('')
+            window.location.reload();
+
+            //this.searchListStaff('')
           } else {
             alert('Error');
           }

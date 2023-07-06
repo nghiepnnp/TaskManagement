@@ -3,7 +3,6 @@ import { Task, gantt } from "dhtmlx-gantt";
 import { TaskService } from '../services/task.service';
 //import { Task } from '../models/task';
 import * as moment from 'moment';
-import { timeout } from 'rxjs';
 
 @Component({
   selector: 'app-task',
@@ -84,43 +83,40 @@ export class TaskComponent implements OnInit {
       //gantt.deleteTask( 16)
 
 
-
+      gantt.init('ganttContainer');
       gantt.config.date_format = '%Y-%m-%d %H:%i';
+      // Promise.all([this.taskService.search('')])
+      //       .then(([data]) => {
+      //         console.log(data)
+      //           gantt.parse({ data });
+      //       });
 
+      //gantt.
+
+      // gantt.parse({
+      //   data: this.listTask,
+      // })
 
       var dp = gantt.createDataProcessor({
         task: {
-          update: (id: number, data: Task) => {
+          update: (data: Task) => {
 
-            console.log('Alo data update dau')
-            console.log(id)
             console.log(data)
 
-            this.taskService.update(id, data).subscribe(
-              (response) => {
-                if (response.Ok === true) {
-                  alert('Success')
-                } else {
-                  alert('Error');
-                }
-              }
-            )
-
-            //setTimeout(() => console.log(result.), 500)
-
+            this.taskService.update(data)
           },
-          create: (data: Task) => this.taskService.insert(data),
-          delete: (id: any) => this.taskService.delete(id)
+           create: (data: Task) => this.taskService.insert(data),
+           delete: (id: any) => this.taskService.delete(id)
+        },
+        link: {
+          // update: (data: Link) => this.linkService.update(data),
+          // create: (data: Link) => this.linkService.insert(data),
+          // delete: (id: any) => this.linkService.remove(id)
         }
       });
-      setTimeout(() => {
-        console.log("Init Success")
-        gantt.init('ganttContainer');
-        console.log("Parse")
-        gantt.parse({ data: this.listTask })
 
-      }, 500)
-
+      console.log("hasData")
+      gantt.parse({ data: this.listTask })
 
     }, 200) // end func timeout
 
@@ -133,7 +129,7 @@ export class TaskComponent implements OnInit {
       (response) => {
         this.listTask = response.Result.map((item: any) => {
           const mappedItem: Task = {
-            id: item.Id,
+            id: item.id,
             text: item.Name,
             start_date: new Date(item.StartDate),
             duration: item.Duration,

@@ -21,7 +21,15 @@ namespace API2.Controllers
             {
                 if (Id is null)
                 {
-                    return Ok(new ApiResult(await dbContext.Tasks.ToListAsync()));
+                    var result = await dbContext.Tasks.ToListAsync();
+
+                    result.ForEach(x =>
+                    {
+                        x.StartDate.ToString("yyyyMMdd");
+                    });
+
+
+                    return Ok(new ApiResult(result));
                 }
 
                 return Ok(new ApiResult

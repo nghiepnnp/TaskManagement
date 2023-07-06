@@ -4,8 +4,6 @@ import { StaffService } from '../services/staff.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ModalComponent } from '../modal/modal.component';
 
-
-
 @Component({
   selector: 'app-staff',
   templateUrl: './staff.component.html',
@@ -28,10 +26,7 @@ export class StaffComponent implements OnInit {
     this.staffService.search(keyword).subscribe(
       (response: any) => {
         this.searchResults = response.Result;
-      },
-      // (error: any) => {
-      //   console.error(error);
-      // }
+      }
     );
   }
 
@@ -57,6 +52,7 @@ export class StaffComponent implements OnInit {
 
   openPopup(isInsert: boolean, id?: number) {
     const modalRef = this.modalService.open(ModalComponent);
+
     if (isInsert) {
       modalRef.componentInstance.isInsert = true;
       modalRef.componentInstance.title = 'Create staff'
@@ -74,7 +70,6 @@ export class StaffComponent implements OnInit {
           } else {
             alert('Error');
           }
-
         },
       })
     }
